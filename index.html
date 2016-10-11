@@ -65,7 +65,7 @@
 
 <link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Hexo, NexT" />
@@ -77,7 +77,7 @@
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
 
 
 
@@ -238,6 +238,1129 @@
             
               
                 
+                <a class="post-title-link" href="/2016/10/09/mysql/" itemprop="url">
+                  mysql笔记
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-09T14:22:55+08:00" content="2016-10-09">
+              2016-10-09
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="显示数据库表支持的引擎"><a href="#显示数据库表支持的引擎" class="headerlink" title="显示数据库表支持的引擎"></a>显示数据库表支持的引擎</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show ENGINES</div></pre></td></tr></table></figure>
+<h1 id="查看当前数据库表的状态"><a href="#查看当前数据库表的状态" class="headerlink" title="查看当前数据库表的状态"></a>查看当前数据库表的状态</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show table status from jt_mysql</div></pre></td></tr></table></figure>
+<h1 id="一些概念"><a href="#一些概念" class="headerlink" title="一些概念"></a>一些概念</h1><h2 id="双主键"><a href="#双主键" class="headerlink" title="双主键"></a>双主键</h2><p>2个字段的值不能同时相同</p>
+<h1 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h1><p>显示最后一个执行语句所产生的错误<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show errors;</div></pre></td></tr></table></figure></p>
+<h1 id="对比MyISAM和InnoDB"><a href="#对比MyISAM和InnoDB" class="headerlink" title="对比MyISAM和InnoDB"></a>对比MyISAM和InnoDB</h1><p>其中表user_sys为InnoDB模式，表user_sys1为MyISAM模式</p>
+<h2 id="插入100万条数据"><a href="#插入100万条数据" class="headerlink" title="插入100万条数据"></a>插入100万条数据</h2><p>编写一个存储过程，名为add_users<br>t为参数：IN t int<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">BEGIN</div><div class="line">  set @num=1;</div><div class="line">  while @num&lt;1000001 DO</div><div class="line">    if t=1 then</div><div class="line">      insert into user_sys(user_name,user_pwd) values(concat(&apos;user&apos;,@num),&apos;123&apos;);</div><div class="line">    else</div><div class="line">      insert into user_sys1(user_name,user_pwd) values(concat(&apos;user&apos;,@num),&apos;123&apos;);</div><div class="line">    end if;</div><div class="line">    set @num=@num+1;</div><div class="line">  end while;</div><div class="line">END</div></pre></td></tr></table></figure></p>
+<p>在查询器中执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">call add_users(1);</div></pre></td></tr></table></figure></p>
+<p>使用阿里云的1核2G内存，插入时间InnoDB非常慢(大概1小时)，MyISAM快很多(大概40s)。</p>
+<h2 id="查询时间对比"><a href="#查询时间对比" class="headerlink" title="查询时间对比"></a>查询时间对比</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">select count(*) from user_sys;  //0.16s</div><div class="line">select count(*) from user_sys1;  //0.02s</div><div class="line"></div><div class="line">select * from user_sys limit 0,1000;  //0.05s</div><div class="line">select * from user_sys1 limit 0,1000;  //0.05s</div><div class="line">select * from user_sys limit 900000,1000;  //0.36s</div><div class="line">select * from user_sys1 limit 900000,1000;  //0.19s</div><div class="line"></div><div class="line">select * from user_sys where user_name=&apos;user10&apos;;  //0.4s</div><div class="line">select * from user_sys1 where user_name=&apos;user10&apos;; //0.21s</div><div class="line">select * from user_sys where user_name=&apos;user900000&apos;;  //0.41s</div><div class="line">select * from user_sys1 where user_name=&apos;user900000&apos;; //0.21s</div></pre></td></tr></table></figure>
+<p>当前mysql版本5.7.15，在查询上的表现,InnoDB表比MyISAM表快那么一点</p>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><p>数据库表字段的索引分普通索引和唯一索引。<br>如果用户名不允许相同，设置唯一索引的好处是，在插入的时候不需要再程序中做判断。<br>对user_name字段添加唯一索引后：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select * from user_sys where user_name=&apos;user900000&apos;;  //0.02s</div><div class="line">select * from user_sys1 where user_name=&apos;user900000&apos;; //0.02s</div></pre></td></tr></table></figure></p>
+<h1 id="用户日志表"><a href="#用户日志表" class="headerlink" title="用户日志表"></a>用户日志表</h1><p>用户日志表不需要支持事务，使用插入数据更快的MyISAM引擎<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `user_log` (</div><div class="line">  `id` int(11) NOT NULL AUTO_INCREMENT,</div><div class="line">  `user_id` int(11) DEFAULT NULL,</div><div class="line">  `log_type` varchar(20) DEFAULT NULL,</div><div class="line">  `log_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,</div><div class="line">  PRIMARY KEY (`id`)</div><div class="line">) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;</div></pre></td></tr></table></figure></p>
+<p>写一个名为sp_user_log的存储过程，灌入数据1000万条数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">BEGIN</div><div class="line">  set @num=1;</div><div class="line">  while @num&lt;10000001 DO</div><div class="line">    insert into user_log(user_id,log_type) values(floor(rand()*100000),&apos;log success&apos;);</div><div class="line">    set @num=@num+1;</div><div class="line">  end while;</div><div class="line">END</div></pre></td></tr></table></figure></p>
+<p>查询用户登录记录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select count(*) from user_sys a,user_log b where a.id=b.user_id;  //用时29.1秒，结果为9999989</div><div class="line">select a.user_name,a.id,b.log_date from user_sys a,user_log b where a.id=b.user_id order by b.id desc limit 1000000,10;  //17.45秒</div></pre></td></tr></table></figure></p>
+<h2 id="给用户表日志表添加冗余字段"><a href="#给用户表日志表添加冗余字段" class="headerlink" title="给用户表日志表添加冗余字段"></a>给用户表日志表添加冗余字段</h2><p>考虑到用户表和用户日志表非常大，同时用户表还是InnoDB模式（在使用中会锁表），因此给用户表日志表添加冗余字段（尽管这样不符合三范式）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select * from user_log order by id desc limit 1000000,10;   //19.61s</div><div class="line">select id,user_name,log_date from user_log order by id desc limit 1000000,10;  //8.28s</div></pre></td></tr></table></figure></p>
+<h1 id="点击日志表"><a href="#点击日志表" class="headerlink" title="点击日志表"></a>点击日志表</h1><p>商品被用户点击的日志表</p>
+<h1 id="mysql函数"><a href="#mysql函数" class="headerlink" title="mysql函数"></a>mysql函数</h1><p>FOUND_ROW()  select时返回最近一条sql的结果集条数<br>ROW_COUNT()  update delete insert受影响的条数</p>
+<h1 id="mysql事件编写定时任务"><a href="#mysql事件编写定时任务" class="headerlink" title="mysql事件编写定时任务"></a>mysql事件编写定时任务</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show VARIABLES like &apos;%event_%&apos;;</div></pre></td></tr></table></figure>
+<p>可以看到查询结果中event_scheduler是off默认的关闭状态<br>设置为on<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">set global event_scheduler=ON</div></pre></td></tr></table></figure></p>
+<h1 id="动态执行sql"><a href="#动态执行sql" class="headerlink" title="动态执行sql"></a>动态执行sql</h1><h1 id="临时表"><a href="#临时表" class="headerlink" title="临时表"></a>临时表</h1><p>drop TEMPORARY table if EXISTS temp_a<br>creat TEMPORARY table temp_a as select 3 as id,’fff’ as name;<br>select * from temp_a;</p>
+<h1 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h1><h2 id="自动提交"><a href="#自动提交" class="headerlink" title="自动提交"></a>自动提交</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">insert into user_balance(user_id,user_money) values (3,20);</div></pre></td></tr></table></figure>
+<p>当我们执行上面的sql语句，可以发现数据就被插入到了数据库表中。这是为何呢？</p>
+<p>autocommit我们可以通过<figure class="highlight plain"><figcaption><span>VARIABLES like '%COMMIT%';```查看```autocommit```的值</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">当通过使用```set autocommit=0```来对当前回话设置autocommit的值后，再执行上面的insert语句后就不会自动在数据库表中插入这条记录。</div><div class="line">新建一个查询会话，直接执行上面的insert语句，插入的记录中id=3</div><div class="line">在```set autocommit=0```的会话中，再执行```commit```，这时候在数据库表中新增了一条记录，同时这条记录的id为2</div><div class="line">为了防止我们一旦插入数据忘了commit,所以不到特殊情况，我们不会设置autocommit=0</div><div class="line"></div><div class="line">## 使用事务</div><div class="line">```mysql</div><div class="line">insert into user_balance(user_id,user_money) values (3,10);</div><div class="line">start TRANSACTION;</div><div class="line">insert into user_balance(user_id,user_money) values (4,20);</div><div class="line">select max(user_id) from user_balance;</div><div class="line">commit;</div></pre></td></tr></table></figure></p>
+<p>使用sleep函数来模拟数据卡顿<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">```mysql</div><div class="line">insert into user_balance(user_id,user_money) values (3,10);</div><div class="line">start TRANSACTION;</div><div class="line">insert into user_balance(user_id,user_money) values (4,20);</div><div class="line">select max(user_id) from user_balance;</div><div class="line">select sleep(6);</div><div class="line">commit;</div></pre></td></tr></table></figure></p>
+<h2 id="事务的异常"><a href="#事务的异常" class="headerlink" title="事务的异常"></a>事务的异常</h2><p>使用自定义异常处理格式：<figure class="highlight plain"><figcaption><span>xxx1 handler for xxx2 执行sql;```</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">xxx1有continue和exit还有undo</div><div class="line">xxx2有SQLSTATE、SQLWARNING、NOT FOUND、SQLEXCEPTION</div></pre></td></tr></table></figure></p>
+<p>BEGIN</p>
+<pre><code>#declare CONTINUE HANDLER for SQLEXCEPTION select &apos;出错了,错误sql语句后面的语句被执行了&apos;；
+#declare EXIT HANDLER for SQLEXCEPTION select &apos;出错了，错误sql语句后面的语句不会被执行&apos;；
+#declare CONTINUE HANDLER for SQLEXCEPTION show ERRORS;
+
+DECLARE err int DEFAULT 0;  #declare定义的变量为局部变量，set @err=0;定义的是回话变量
+declare CONTINUE HANDLER for SQLEXCEPTION set err=1;
+start TRANSACTION;
+#insert into user_balance(user_id,user_money) values (3,&apos;ef&apos;);
+insert into user_balance(user_id,user_money) values (4,10);
+insert into user_balance(user_id,user_money) values (3,&apos;ef&apos;);
+if err=1 THEN
+      select &apos;出错了&apos;;
+  ROLLBACK;
+ELSE
+  COMMIT;
+end if;
+</code></pre><p>end<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## 增加一个用户充值日志表，使用事务，同时模拟服务器很卡</div><div class="line">写一个名为```sp_add_usermoney```的存储过程，定义如下输入</div><div class="line">IN _user_id int,IN _log_type tinyint,IN _log_des varchar(200),IN _log_value decimal(10,2),IN isstop bit</div></pre></td></tr></table></figure></p>
+<p>BEGIN<br>    DECLARE t_error int DEFAULT 0;<br>    DECLARE usercount int DEFAULT 0;<br>    DECLARE CONTINUE HANDLER for SQLEXCEPTION set t_error=1;<br>    start TRANSACTION;</p>
+<pre><code>  #插入用户充值记录表
+  insert into user_balance_log(user_id,log_type,log_des,log_value) values(_user_id,_log_type,_log_des,_log_value);
+  if ROW_COUNT()&gt;0 THEN #代表日志表插入成功
+     #判断用户余额表是否存在用户
+     select count(*) into usercount from user_balance where user_id=_user_id;
+       if usercount&gt;0 THEN #代表已经存在用户
+         update user_balance set user_money=user_money+_log_value where user_id=_user_id;
+       ELSE
+         insert into user_balance(user_id,user_money) values(_user_id,_log_value);
+       end if;
+  end if;
+
+
+#模拟服务器很卡
+    if isstop=true then
+    select SLEEP(7),&apos;卡顿结束&apos;;
+    end if;
+
+
+if t_error=1 THEN
+  ROLLBACK;
+ELSE
+  commit;
+end if;
+</code></pre><p>END<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">执行存储过程```call sp_add_usermoney(3,1,&apos;用户充值&apos;,10,true);</div></pre></td></tr></table></figure></p>
+<p>如果在这卡顿的7秒时间内，在另外一个会话中执行了如下的sql语句<br><figure class="highlight plain"><figcaption><span>sp_add_usermoney(3,1,'用户充值',10,false);```</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">那么会发现在表user_balance中将出现几条user_id为3的记录。</div><div class="line">虽然我们可以通过去掉user_balance表中的id字段，将user_id设为主键来解决这个问题。但是我们为了理解下一节的内容，而没有这么做</div><div class="line"></div><div class="line">## 表级锁</div><div class="line">上一节模拟了服务器卡顿的情况。发现在多线程并发时，如果操作不当就会产生数据冲突，所以这一节学习一下mysql中的锁表机制</div><div class="line">### 读锁</div><div class="line">另外的一个会话只能读，不能写入</div></pre></td></tr></table></figure></p>
+<p>lock table user_balance read;</p>
+<p>#delete from user_balance; #表不能写入，执行到这条语句将出错</p>
+<p>#insert into user_balance(user_id,user_money) values(3,50);  #表不能写入，执行到这条语句将出错<br>select * from user_balance;<br>unlock tables;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">如果忘了写```unlock tables;```,在另外一个会话中进行写操作，会出现等待。</div><div class="line">在等待的过程中，要么执行一下```unlock tables;```,要么再次执行```lock table user_balance read;```，那么那个另外的会话中等待着的写操作将执行。</div><div class="line"></div><div class="line">### 写锁</div><div class="line">写锁之后（忘了写unlock tables;），另外的会话不管是读还是写的操作都不能进行</div></pre></td></tr></table></figure></p>
+<p>lock table user_balance write;<br>insert into user_balance(user_id,user_money) values(7,30);<br>select * from user_balance;<br>unlock tables;<br>```</p>
+<h2 id="行级锁"><a href="#行级锁" class="headerlink" title="行级锁"></a>行级锁</h2>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/10/09/centos-php/" itemprop="url">
+                  centos-php
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-09T11:00:05+08:00" content="2016-10-09">
+              2016-10-09
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="下载编译"><a href="#下载编译" class="headerlink" title="下载编译"></a>下载编译</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">wget http://cn2.php.net/get/php-7.0.11.tar.gz/from/this/mirror -O php-7.0.11.tar.gz</div><div class="line">tar zxvf php-7.0.11.tar.gz</div><div class="line">cd php-7.0.11</div><div class="line">./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-apxs2=/usr/local/httpd/bin/apxs --with-mysqli=mysqlnd --with-pdo-mysql=mysqlnd --with-iconv-dir --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --enable-mbregex --enable-mbstring --enable-pcntl --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets --with-xmlrpc --enable-zip --enable-soap --with-gettext --disable-fileinfo --enable-opcache</div><div class="line"></div><div class="line">--enable-ftp --enable-intl --with-xsl</div></pre></td></tr></table></figure>
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><ol>
+<li>libxml2<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">configure: error: xml2-config not found. Please check your libxml2 installation.</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>解决<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo yum install libxml2-devel  glib2-devel</div></pre></td></tr></table></figure></p>
+<ol>
+<li>libcurl<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">configure: error: Please reinstall the libcurl distribution -easy.h should be in &lt;curl-dir&gt;/include/curl/</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>解决：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo yum install libcurl-devel</div></pre></td></tr></table></figure></p>
+<ol>
+<li>GD<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">configure: error: jpeglib.h not found</div><div class="line">configure: error: png.h not found.</div><div class="line">configure: error: freetype-config not found.</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>解决<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo yum install libjpeg-devel libpng-devel freetype-devel</div></pre></td></tr></table></figure></p>
+<ol>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">configure: error: mcrypt.h not found. Please reinstall libmcrypt.</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>```<br>sudo yum install libmcrypt libmcrypt-devel</p>
+<p>sudo yum install gd gd-devel</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/10/02/centos-shell-basic/" itemprop="url">
+                  centos-shell-basic
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-02T05:43:07+08:00" content="2016-10-02">
+              2016-10-02
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>shell也有很多版本如Bourne shell (sh)、C shell (csh) 和 Korn shell (ksh)<br>常用的、也是Centos默认的shell 就 是Bash(Bourne Again shell)</p>
+<ul>
+<li>在shell脚本中获取参数<br>前面我们学到:$$ Shell本身的PID(ProcessID)</li>
+</ul>
+<p>$? 最后运行的命令的结束代码(返回值)</p>
+<p>$# 添加到Shell的参数个数</p>
+<p>$0 Shell本身的文件名</p>
+<p>$1~$n 添加到Shell的各参数值。$1是第1参 数、$2是第2参数…。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line">#add for chkconfig</div><div class="line">#chkconfig:35 80 10</div><div class="line">#description:i am god</div><div class="line">#processname:shenyid</div><div class="line"></div><div class="line">PID_FILE=&quot;/etc/shenyid.pid&quot;</div><div class="line">start()</div><div class="line">&#123;</div><div class="line">  if [ -f $PID_FILE ] </div><div class="line">	then</div><div class="line">     echo &quot;god_me is already running&quot;</div><div class="line">     else</div><div class="line">      echo &quot;123&quot; &gt; $PID_FILE</div><div class="line">      echo &quot;start god_me&quot;</div><div class="line">  fi</div><div class="line">&#125;</div><div class="line">stop()</div><div class="line">&#123;</div><div class="line">   rm $PID_FILE -f</div><div class="line">   echo &quot;god_me is stoped&quot;</div><div class="line">&#125;</div><div class="line"></div><div class="line"># /home/god/bin/god_me</div><div class="line">   case $1 in</div><div class="line">     xxoo)</div><div class="line">     start </div><div class="line">     ;;</div><div class="line">    ooxx)</div><div class="line">     stop</div><div class="line">    ;;</div><div class="line">    *)</div><div class="line">     echo &quot;unknown&quot;</div><div class="line">   ;;</div><div class="line">   esac</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/29/simple-programm-use-c/" itemprop="url">
+                  通过编写一个简单的c程序，来学校centos
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-29T22:59:08+08:00" content="2016-09-29">
+              2016-09-29
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="最简单的c程序"><a href="#最简单的c程序" class="headerlink" title="最简单的c程序"></a>最简单的c程序</h1><ol>
+<li><p>编写程序<br>新建一个hello.c的文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line"><span class="built_in">printf</span>(<span class="string">"hello world\n"</span>);</div><div class="line"><span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gcc hello.c -o hello</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./hello</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="输出我的年龄"><a href="#输出我的年龄" class="headerlink" title="输出我的年龄"></a>输出我的年龄</h1><ol>
+<li><p>编写程序</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_age</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="number">18</span>;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="keyword">int</span> age = get_age();</div><div class="line">  <span class="built_in">printf</span>(<span class="string">"my age is %d"</span>, age);</div><div class="line">  <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gcc hello.c -o hello</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./hello</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="将函数封装到外部"><a href="#将函数封装到外部" class="headerlink" title="将函数封装到外部"></a>将函数封装到外部</h1><ol>
+<li><p>创建一个文件me.h,在这个文件中只做声明，不实现<br>内容为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_age</span><span class="params">()</span></span>;</div></pre></td></tr></table></figure>
+</li>
+<li><p>创建一个文件me.c，在这个文件中做函数的实现</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">get_age</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="number">19</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>创建一个文件show_age.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"me.h"</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="keyword">int</span> age = get_age();</div><div class="line">  <span class="built_in">printf</span>(<span class="string">"my age is %d"</span>, age);</div><div class="line">  <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>%d 表示一个数字</p>
+<ol>
+<li><p>联合编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gcc show_age.c me.c -o showAge</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./showAge</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="使用make软件进行编译"><a href="#使用make软件进行编译" class="headerlink" title="使用make软件进行编译"></a>使用make软件进行编译</h1><ol>
+<li>创建一个makefile文件（大小写都可以）<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">showAge:me.c show_age.c</div><div class="line">    gcc me.c show_age.c -o showAge</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>gcc前面是tab键产生的空格</p>
+<ol>
+<li><p>使用make进行编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">make</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./showAge</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="C的基本数据类型"><a href="#C的基本数据类型" class="headerlink" title="C的基本数据类型"></a>C的基本数据类型</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"me.h"</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="comment">//char ch = 'a';  //注意是单引号</span></div><div class="line">  <span class="comment">//printf(" is %c\n",ch);</span></div><div class="line">  <span class="keyword">char</span> ch[] = <span class="string">"yefeng"</span>;  <span class="comment">//这里不能使用单引号</span></div><div class="line">  <span class="built_in">printf</span>(<span class="string">" is %s\n"</span>,ch);</div><div class="line">  <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>%c 单字符<br>C中没有string类型，应该使用字符数组保存字符串<br>%s  字符串<br>%d  十进制无符号整形<br>%p  输出指针</p>
+<h2 id="理解一下指针"><a href="#理解一下指针" class="headerlink" title="理解一下指针"></a>理解一下指针</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"me.h"</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</div><div class="line">  <span class="keyword">char</span> *ch = <span class="string">"yefeng"</span>;</div><div class="line">  <span class="keyword">int</span> i;</div><div class="line">  <span class="keyword">for</span>(i=<span class="number">0</span>,i&lt;<span class="number">6</span>;i++)&#123;</div><div class="line">  <span class="built_in">printf</span>(<span class="string">"is %c \n"</span>,*ch);</div><div class="line">  ch++;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="使用动态链接库编译主程序"><a href="#使用动态链接库编译主程序" class="headerlink" title="使用动态链接库编译主程序"></a>使用动态链接库编译主程序</h1><ol>
+<li>把me.c编译为动态链接库<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gcc -o libme.so me.c -shared</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>动态链接库，linux上以so为后缀</p>
+<ol>
+<li><p>使用动态链接库进行编译</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">gcc -L 动态链接库的文件夹位置 -l 动态链接库的库名 show_age.c -o showAge</div></pre></td></tr></table></figure>
+</li>
+<li><p>运行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./showAge</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>出现错误：提示无法找到libme.so</p>
+<ol>
+<li><p>ldd探测程序用到了哪些依赖</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ldd showAge</div></pre></td></tr></table></figure>
+</li>
+<li><p>将libme.so拷贝到共享库所在的文件夹<br>centos系统上有几个文件夹用于存放公共库文件<br>/lib 内核级<br>/usr/lib 用户系统级<br>/usr/lib64/ 64位系统才有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cp libme.so /lib</div></pre></td></tr></table></figure>
+</li>
+<li><p>再运行还是提示找不到类库文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ldconfig</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>暂时姑且认为 linux把动态库缓存起来了。加了新玩意儿需要重新更新缓存</p>
+<h1 id="让自己的小程序能够安装（make-install"><a href="#让自己的小程序能够安装（make-install" class="headerlink" title="让自己的小程序能够安装（make install)"></a>让自己的小程序能够安装（make install)</h1><p>配置makefile，让其做如下几个操作<br>1、生成libme.so 文件<br>2、利用这个so文件,编译可执行程序shenyi<br>3、把libme.so拷贝到/lib或/usr/lib中<br>4、执行ldconfig 更新缓存<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">showAge:me.c libme.so</div><div class="line">    gcc -L ./ -l me show_age.c -o showAge</div><div class="line">libme.so:me.c</div><div class="line">    gcc -shared -o libme.so me.c</div><div class="line">install:</div><div class="line">    cp ./libm.so /usr/lib</div><div class="line">    ldconfig</div></pre></td></tr></table></figure></p>
+<h1 id="快乐的学点C"><a href="#快乐的学点C" class="headerlink" title="快乐的学点C"></a>快乐的学点C</h1><p>1、C语言规定main函数的参数只能有两个<br>2、第一个必须是整型变量(系统自动赋值 )<br>3、第二个必须是指向字符串的指针数组<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;</div><div class="line">  <span class="keyword">int</span> i;</div><div class="line">  <span class="comment">//for(i=0; i &lt; argc; i++)&#123;</span></div><div class="line">  <span class="comment">//printf("arg is %s\n",argc[i]);</span></div><div class="line">  <span class="comment">//&#125;</span></div><div class="line">  </div><div class="line">    <span class="keyword">if</span>(argc == <span class="number">2</span>)&#123;</div><div class="line">        <span class="keyword">if</span>(<span class="built_in">strcmp</span>(argv[<span class="number">1</span>],<span class="string">"-version"</span>) == <span class="number">0</span>)&#123;</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"god version is 1.0\n"</span>);</div><div class="line">        &#125;<span class="keyword">else</span>&#123;</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, argv[<span class="number">1</span>]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">  <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>创建makefile<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">showAge:god.c</div><div class="line">    gcc god.c -o god</div></pre></td></tr></table></figure></p>
+<h1 id="进程级变量和环境变量"><a href="#进程级变量和环境变量" class="headerlink" title="进程级变量和环境变量"></a>进程级变量和环境变量</h1><h2 id="进程级变量"><a href="#进程级变量" class="headerlink" title="进程级变量"></a>进程级变量</h2><p>在shell中定义一个环境变量，然后输出这个环境变量<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">myname = gyf</div><div class="line">echo $myname</div></pre></td></tr></table></figure></p>
+<p>编写一个c程序<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[])</span></span>&#123;</div><div class="line"><span class="comment">//系统环境变量</span></div><div class="line">    <span class="keyword">char</span> *getResult = getenv(<span class="string">"PATH"</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"PATH is %s\n"</span> , getResult);</div><div class="line"><span class="comment">//临时环境变量    </span></div><div class="line">    putenv(<span class="string">"myname=hiyefeng"</span>);</div><div class="line">    <span class="keyword">char</span> *getResult = getenv(<span class="string">"myname"</span>);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"myname is %s\n"</span> , getResult);</div><div class="line"></div><div class="line">  <span class="keyword">int</span> i;</div><div class="line">  <span class="comment">//for(i=0; i &lt; argc; i++)&#123;</span></div><div class="line">  <span class="comment">//printf("arg is %s\n",argc[i]);</span></div><div class="line">  <span class="comment">//&#125;</span></div><div class="line">  </div><div class="line">    <span class="keyword">if</span>(argc == <span class="number">2</span>)&#123;</div><div class="line">        <span class="keyword">if</span>(<span class="built_in">strcmp</span>(argv[<span class="number">1</span>],<span class="string">"-version"</span>) == <span class="number">0</span>)&#123;</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"god version is 1.0\n"</span>);</div><div class="line">        &#125;<span class="keyword">else</span>&#123;</div><div class="line">            <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, argv[<span class="number">1</span>]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">  <span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>shell中和c程序中定义的临时变量虽然变量名称相同，但是他们定义的变量都是进程级的变量，值是不同的。</p>
+<h2 id="全局环境变量"><a href="#全局环境变量" class="headerlink" title="全局环境变量"></a>全局环境变量</h2><ol>
+<li>全局环境变量配置文件<br>/etc/profile 全局环境变量脚本文件(这是 啥?)<br>好比windows的系统环境变量。任何用户都可 以访问到<br>我们在最后面加上一句话 :<br>GOD_PATH=/god<br>export GOD_PATH (export用于设置环境变 量,并传导到全局)</li>
+<li>接下来执行<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">source /etc/profile</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>source 命令 是内建命令。用于在bash环境下 读取和立即执行某文件中的 命令<br>/etc/profile是在Bash启动时率先运 行的文件之一</p>
+<h3 id="C-语言来了-string-h"><a href="#C-语言来了-string-h" class="headerlink" title="C 语言来了(string.h)"></a>C 语言来了(string.h)</h3><p>● 如何 把字符串相加,用到3个函数<br>● strcpy 复制字符串<br>● strcat 连接字符串<br>● strlen 获取串长度<br>● char <em>a=“shenyi”;<br>● char </em>b=“yi”;<br>● char c[strlen(a)+strlen(b)]; //定义个字符数组<br>● strcpy(c,a);//先拷贝a到c<br>● strcat(c,b);//两者相连<br><figure class="highlight c"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></div><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string.h&gt;</span></span></div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">makelogfile</span><span class="params">()</span></span>;</div><div class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> *argv[])</span></span></div><div class="line">&#123;</div><div class="line"></div><div class="line">  makelogfile();</div><div class="line">   <span class="keyword">int</span> i;</div><div class="line">     <span class="keyword">if</span>(argc==<span class="number">2</span>)</div><div class="line">	&#123;</div><div class="line"> 	 <span class="keyword">if</span>(<span class="built_in">strcmp</span>(argv[<span class="number">1</span>],<span class="string">"-version"</span>)==<span class="number">0</span>) <span class="comment">//show version</span></div><div class="line">	  &#123;</div><div class="line">	    <span class="built_in">printf</span>(<span class="string">"god version is 1.0\n"</span>); </div><div class="line">	  &#125;  </div><div class="line">	 <span class="keyword">else</span></div><div class="line">	  &#123;</div><div class="line">	     <span class="built_in">printf</span>(<span class="string">"%s\n"</span>,argv[<span class="number">1</span>]);  <span class="comment">// show common string</span></div><div class="line">	  &#125;</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> <span class="number">0</span>;</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">void</span> <span class="title">makelogfile</span><span class="params">()</span></span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">char</span> *god_path=getenv(<span class="string">"GOD_PATH"</span>);</div><div class="line">    <span class="keyword">if</span>(god_path==<span class="literal">NULL</span>)</div><div class="line">	&#123;</div><div class="line">	  <span class="built_in">printf</span>(<span class="string">"can not find GOD_PATH"</span>);</div><div class="line">	  <span class="keyword">return</span>;</div><div class="line">	&#125;</div><div class="line">    <span class="keyword">char</span> *god_file_name=<span class="string">"/godlog.log"</span>;</div><div class="line">    mkdir(god_path);</div><div class="line"></div><div class="line">    <span class="keyword">char</span> god_file_path[<span class="built_in">strlen</span>(god_path)+<span class="built_in">strlen</span>(god_file_name)];</div><div class="line">    <span class="built_in">strcpy</span>(god_file_path,god_path);</div><div class="line">    <span class="built_in">strcat</span>(god_file_path,god_file_name);</div><div class="line">    FILE *fp=fopen(god_file_path,<span class="string">"w"</span>);</div><div class="line">    fclose(fp);</div><div class="line">    <span class="built_in">printf</span>(<span class="string">"god log file make"</span>);</div><div class="line">   </div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上面的代码中voild表示没有任何的返回值</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/29/centos-httpd/" itemprop="url">
+                  centos7安装httpd
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-29T15:40:36+08:00" content="2016-09-29">
+              2016-09-29
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p><a href="http://httpd.apache.org/docs/2.4/" target="_blank" rel="external">文档</a></p>
+<h1 id="编译安装"><a href="#编译安装" class="headerlink" title="编译安装"></a>编译安装</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">wget http://mirrors.tuna.tsinghua.edu.cn/apache//httpd/httpd-2.4.23.tar.gz</div><div class="line">tar zxvf httpd-2.4.23.tar.gz</div><div class="line">cd httpd-2.4.23/srclib</div><div class="line">wget http://mirror.bit.edu.cn/apache//apr/apr-1.5.2.tar.gz</div><div class="line">tar zxvf apr-1.5.2.tar.gz</div><div class="line">mv apr-1.5.2 apr</div><div class="line">wget http://mirror.bit.edu.cn/apache//apr/apr-util-1.5.4.tar.gz</div><div class="line">tar zxvf apr-util-1.5.4.tar.gz</div><div class="line">mv apr-util-1.5.4 apr-util</div><div class="line">cd ..</div><div class="line">./configure --prefix=/usr/local/httpd --enable-mods-shared=most --enable-headers --enable-mime-magic --enable-proxy --enable-so --enable-rewrite --with-ssl --enable-ssl --enable-deflate --with-pcre --with-included-apr --with-apr-util --enable-mpms-shared=all --with-mpm=prefork --enable-remoteip</div><div class="line">make</div><div class="line">sudo yum install  pcre-devel zlib-devel openssl-devel</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+<p>常见错误：</p>
+<ol>
+<li><p>未安装zlib-devel，表现为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">checking whether to enable mod_deflate... configure: error: mod_deflate has been requested but can not be built due to prerequisite failures</div></pre></td></tr></table></figure>
+</li>
+<li><p>未安装openssl-devel</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">checking whether to enable mod_ssl... configure: error: mod_ssl has been requested but can not be built due to prerequisite failures</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="创建用于运行httpd服务的用户"><a href="#创建用于运行httpd服务的用户" class="headerlink" title="创建用于运行httpd服务的用户"></a>创建用于运行httpd服务的用户</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">sudo groupadd www</div><div class="line">sudo useradd -s /sbin/nologin -g www www</div><div class="line">vi /usr/local/httpd/conf/httpd.conf</div><div class="line">将user,group改为www</div></pre></td></tr></table></figure>
+<h1 id="载入服务"><a href="#载入服务" class="headerlink" title="载入服务"></a>载入服务</h1><p>虽然apache已经安装好了，但是我们还不能像平时一样使用service httpd start | stop这样的命令来启动和停用服务。按照下面的方法来实现这个。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo cp /usr/local/httpd/bin/apachectl /etc/init.d/httpd</div></pre></td></tr></table></figure></p>
+<p>在/etc/init.d/httpd文件的#!/bin/sh 下面加入两行:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># chkconfig: 35 85 15</div><div class="line"># description: Activates/Deactivates Apache 2.4.23</div></pre></td></tr></table></figure></p>
+<p>再执行以下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chkconfig --add httpd</div></pre></td></tr></table></figure></p>
+<h1 id="启动httpd服务"><a href="#启动httpd服务" class="headerlink" title="启动httpd服务"></a>启动httpd服务</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo service httpd start</div></pre></td></tr></table></figure>
+<p>#iptables<br>sudo iptables -t filter -A INPUT -p tcp –dport 80 -j ACCEPT<br>sudo service iptables save<br>sudo service iptables restart</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/28/sublime/" itemprop="url">
+                  sublime使用技巧
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-28T16:39:00+08:00" content="2016-09-28">
+              2016-09-28
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>command + shift + p<br>install Packages</p>
+<p>常用插件</p>
+<ul>
+<li>Convert​To​UTF8<br>文本编码自动转换，减少中日韩文乱码问题。</li>
+</ul>
+<p><a href="http://moxfive.xyz/2015/11/30/sublime-config/" target="_blank" rel="external">Sublime Text 3 使用配置与插件安装</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/28/centos-basic/" itemprop="url">
+                  centos基础
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-28T15:05:51+08:00" content="2016-09-28">
+              2016-09-28
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <ul>
+<li><p>ifconfig<br>用来显示当前IP ,其中eth0 是默认网卡</p>
+</li>
+<li><p>yum<br>yum search<br>yum install<br>yum remove</p>
+</li>
+<li><p>环境变量<br>$PATH</p>
+</li>
+<li><p>which 软件名<br>查找软件在哪里</p>
+</li>
+<li><p>chmod<br>chmod u+x  用户<br>chmod g+x  组<br>chmod o+x  其他</p>
+</li>
+<li><p>ps<br>ps -ef -u 用户名<br>ps -ef | grep<br>ps aux 显示正在内存中的进程</p>
+</li>
+<li><p>chkconfig<br>在/etc/init.d/下创建一个脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#add for chkconfig 必须</div><div class="line">#chkconfig:35 80 10</div><div class="line">#description:i am god</div><div class="line">#processname:yefengd //服务名</div><div class="line">/home/god/bin/god_me</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>80代表启动优先级 #10代表关闭优先级<br>  等级代号<br>● 0–关机<br>● 1 - 单用户模式<br>● 2 - 多用户,但是没有NFS ,不能使用网络<br>● 3 - 完全多用户模式(标准模式)<br>● 4-保留<br>● 5-桌面模式<br>● 6-重新启动<br>一般我们设置 3,5 即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chkconfig --add yefengd</div></pre></td></tr></table></figure>
+<ul>
+<li><p>pgrep 显示进程ID<br>pgrep 进程名</p>
+</li>
+<li><p>pkill 批量杀进程<br>pkill 进程名</p>
+</li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/28/centos-install-mysql/" itemprop="url">
+                  centos安装mysql
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-28T13:33:12+08:00" content="2016-09-28">
+              2016-09-28
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="为将要安装的MySQL服务添加一个用户"><a href="#为将要安装的MySQL服务添加一个用户" class="headerlink" title="为将要安装的MySQL服务添加一个用户"></a>为将要安装的MySQL服务添加一个用户</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">useradd mysql -M -s /sbin/nologin</div></pre></td></tr></table></figure>
+<p>-M代表不生成 Home目录<br>-s 后面的内容,代表不允许登录。</p>
+<h2 id="创建存放数据库的文件夹"><a href="#创建存放数据库的文件夹" class="headerlink" title="创建存放数据库的文件夹"></a>创建存放数据库的文件夹</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mkdir -p /data/mysql</div><div class="line">chown -R mysql:mysql /data/mysql</div></pre></td></tr></table></figure>
+<h1 id="下载mysql社区版源码"><a href="#下载mysql社区版源码" class="headerlink" title="下载mysql社区版源码"></a>下载mysql社区版源码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">wget http://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-boost-5.7.15.tar.gz</div><div class="line">tar zxf mysql-boost-5.7.15.tar.gz</div><div class="line">cd mysql-5.7.15</div><div class="line">yum install cmake</div><div class="line">cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/mysql -DMYSQL_DATADIR=/data/mysql -DSYSCONFDIR=/etc  -DWITH_BOOST=boost</div><div class="line">make -j `cat /proc/cpuinfo | grep processor | wc -l `</div><div class="line">make install</div></pre></td></tr></table></figure>
+<h2 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Curses library not found.  Please install appropriate package</div></pre></td></tr></table></figure>
+<p>在Linux/Unix下广泛应用的图形函数库<br>解决：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum search curse</div><div class="line">yum install ncurses-devel</div></pre></td></tr></table></figure></p>
+<h1 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h1><p>1、配置文件在 /etc/my.cnf<br>mv /etc/my.cnf etc/my_backup.cnf<br>cp /usr/local/mysql/support-files/my-default.cnf /etc/my.cnf<br>简单编辑一下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"># For advice on how to change settings please see</div><div class="line"># http://dev.mysql.com/doc/refman/5.7/en/server-configuration-defaults.html</div><div class="line"># *** DO NOT EDIT THIS FILE. It&apos;s a template which will be copied to the</div><div class="line"># *** default location during install, and will be replaced if you</div><div class="line"># *** upgrade to a newer version of MySQL.</div><div class="line"></div><div class="line">[mysqld]</div><div class="line"></div><div class="line"># Remove leading # and set to the amount of RAM for the most important data</div><div class="line"># cache in MySQL. Start at 70% of total RAM for dedicated server, else 10%.</div><div class="line"># innodb_buffer_pool_size = 128M</div><div class="line"></div><div class="line"># Remove leading # to turn on a very important data integrity option: logging</div><div class="line"># changes to the binary log between backups.</div><div class="line"># log_bin</div><div class="line"></div><div class="line"># These are commonly set, remove the # and set as required.</div><div class="line">basedir = /usr/local/mysql</div><div class="line">datadir = /data/mysql</div><div class="line">port = 3306</div><div class="line">server_id = 1</div><div class="line">socket = /tmp/mysql.sock</div><div class="line"></div><div class="line"># Remove leading # to set options mainly useful for reporting servers.</div><div class="line"># The server defaults are faster for transactions and fast SELECTs.</div><div class="line"># Adjust sizes as needed, experiment to find the optimal values.</div><div class="line"># join_buffer_size = 128M</div><div class="line"># sort_buffer_size = 2M</div><div class="line"># read_rnd_buffer_size = 2M</div><div class="line"></div><div class="line">sql_mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES</div></pre></td></tr></table></figure></p>
+<p>2、官方帮我们做了贴心的启动脚本文件拷贝到/etc/init.d/里面。譬如命名为mysqld<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">cp /usr/local/mysql/support-files/mysql.server /etc/init.d/mysqld</div><div class="line">#chmod +x /etc/init.d/mysqld</div><div class="line">#chkconfig --add mysqld</div><div class="line">chkconfig mysqld on</div></pre></td></tr></table></figure></p>
+<ol>
+<li>添加软链<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">ln -sf /usr/local/mysql/bin/mysql /usr/bin/mysql</div><div class="line">#ln -sf /usr/local/mysql/bin/mysqldump /usr/bin/mysqldump</div><div class="line">#ln -sf /usr/local/mysql/bin/myisamchk /usr/bin/myisamchk</div><div class="line">#ln -sf /usr/local/mysql/bin/mysqld_safe /usr/bin/mysqld_safe</div><div class="line">#ln -sf /usr/local/mysql/bin/mysqlcheck /usr/bin/mysqlcheck</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h1 id="初始化mysql"><a href="#初始化mysql" class="headerlink" title="初始化mysql"></a>初始化mysql</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">/usr/local/mysql/bin/mysqld --initialize --user=mysql --basedir=/usr/local/mysql --datadir=/data/mysql</div></pre></td></tr></table></figure>
+<p>生成一个临时的root密码.<br>复制下来 siZBmem0ZI+w (你的和我的不一样哦)</p>
+<h1 id="启动mysql"><a href="#启动mysql" class="headerlink" title="启动mysql"></a>启动mysql</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">service mysqld restart</div></pre></td></tr></table></figure>
+<h1 id="修改密码"><a href="#修改密码" class="headerlink" title="修改密码"></a>修改密码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mysql -uroot -p</div><div class="line">ALTER USER &apos;root&apos;@&apos;localhost&apos; IDENTIFIED BY &apos;MyNewPass&apos;;</div></pre></td></tr></table></figure>
+<p>若忘记了密码，可以跳过权限认证。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mysqld_safe --user=mysql --skip-grant-tables</div></pre></td></tr></table></figure></p>
+<p>这时你输入mysql -u root 则无需密码 直接进入 (也可以在my.cnf 中加入skip-grant- tables,然后重启)</p>
+<p>参考：</p>
+<ul>
+<li><a href="https://blog.linuxeye.com/432.html" target="_blank" rel="external">https://blog.linuxeye.com/432.html</a></li>
+<li><a href="https://blog.linuxeye.com/379.html" target="_blank" rel="external">MySQL性能调优my.cnf详解</a></li>
+<li><a href="http://dev.mysql.com/doc/refman/5.7/en/" target="_blank" rel="external">mysql5.7官方手册</a></li>
+</ul>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2016/09/28/centos-startup/" itemprop="url">
+                  centos起步
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-28T12:28:51+08:00" content="2016-09-28">
+              2016-09-28
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="新建用户，禁止root登陆，禁止通过密码登录"><a href="#新建用户，禁止root登陆，禁止通过密码登录" class="headerlink" title="新建用户，禁止root登陆，禁止通过密码登录"></a>新建用户，禁止root登陆，禁止通过密码登录</h1><p>系统更新<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum update</div></pre></td></tr></table></figure></p>
+<p>添加一个用户<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">useradd yefeng &amp;&amp; passwd yefeng</div></pre></td></tr></table></figure></p>
+<p>使该用户有sudo权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">usermod -aG wheel yefeng</div></pre></td></tr></table></figure></p>
+<p>在Linux或OS X系统上创建RSA公私钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -b 4096</div></pre></td></tr></table></figure></p>
+<p>在服务器上创建文件夹<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/.ssh &amp;&amp; sudo chmod -R 700 ~/.ssh/</div></pre></td></tr></table></figure></p>
+<p>上传公钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">scp ~/.ssh/id_rsa.pub yefeng@ip_address:~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<p>禁止root用户通过ssh登录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo vi /etc/ssh/sshd_config</div></pre></td></tr></table></figure></p>
+<p>搜索PermitRootLogin设置为no</p>
+<p>搜索PasswordAuthentication通过密码登录，考虑到经常在多台电脑上ssh登录，没有将此项设置为no</p>
+<p>重启SSH服务以使上面的改动生效<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo systemctl restart sshd</div></pre></td></tr></table></figure></p>
+<h1 id="iptables"><a href="#iptables" class="headerlink" title="iptables"></a>iptables</h1><p>Centos7 默认是已安装了 Firewall，但是没有启动的。如果打算使用 Firewall ，可以看一下这篇文章<br><a href="https://help.aliyun.com/knowledge_detail/41317.html#云服务器 ECS CentOS 7配置默认防火墙 Firewall" target="_blank" rel="external">云服务器 ECS CentOS 7配置默认防火墙 Firewall</a><br>我们这里安装并开启iptables<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo yum install iptables-services</div></pre></td></tr></table></figure></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/09/26/hello-world/" itemprop="url">
                   Hello World
                 </a>
@@ -360,13 +1483,20 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
 
           
 
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
           
 
         </nav>
@@ -471,28 +1601,28 @@
   
 
 
-  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
 
-  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
-
-
-
-  
-  
-
-
-  <script type="text/javascript" src="/js/src/affix.js?v=5.0.1"></script>
-
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.1"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
 
 
 
   
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.2"></script>
+
+
+
+  
 
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
 
 
 

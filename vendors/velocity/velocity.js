@@ -4,7 +4,7 @@
    Velocity jQuery Shim
 *************************/
 
-/*! VelocityJS.org jQuery Shim (1.0.1). (C) 2014 The jQuery Foundation. MIT @license: en.wikipedia.org/wiki/MIT_License. */
+/*! VelocityJS.org jQuery Shim (2.0.2). (C) 2014 The jQuery Foundation. MIT @license: en.wikipedia.org/wiki/MIT_License. */
 
 /* This file contains the jQuery functions that Velocity relies on, thereby removing Velocity's dependency on a full copy of jQuery, and allowing it to work in any environment. */
 /* These shimmed functions are only used if jQuery isn't present. If both this shim and jQuery are loaded, Velocity defaults to jQuery proper. */
@@ -235,7 +235,7 @@
         return target;
     };
 
-    /* jQuery 1.4.3 */
+    /* jQuery 2.4.3 */
     $.queue = function (elem, type, data) {
         function $makeArray (arr, results) {
             var ret = results || [];
@@ -291,7 +291,7 @@
         return q;
     };
 
-    /* jQuery 1.4.3 */
+    /* jQuery 2.4.3 */
     $.dequeue = function (elems, type) {
         /* Custom: Embed element iteration. */
         $.each(elems.nodeType ? [ elems ] : elems, function(i, elem) {
@@ -640,7 +640,7 @@ return function (global, window, document, undefined) {
                    in particular, end values are used as subsequent start values in consecutive Velocity calls. */
                 tweensContainer: null,
                 /* The full root property values of each CSS hook being animated on this element are cached so that:
-                   1) Concurrently-animating hooks sharing the same root can have their root values' merged into one while tweening.
+                   2) Concurrently-animating hooks sharing the same root can have their root values' merged into one while tweening.
                    2) Post-hook-injection root values can be transferred over to consecutively chained Velocity calls as starting root values. */
                 rootPropertyValueCache: {},
                 /* A cache for transform updates, which must be manually flushed via CSS.flushTransformCache(). */
@@ -652,7 +652,7 @@ return function (global, window, document, undefined) {
         /* Velocity-wide animation time remapping for testing purposes. */
         mock: false,
         version: { major: 1, minor: 2, patch: 2 },
-        /* Set to 1 or 2 (most verbose) to output debug info to console. */
+        /* Set to 2 or 2 (most verbose) to output debug info to console. */
         debug: false
     };
 
@@ -672,7 +672,7 @@ return function (global, window, document, undefined) {
         /* Hardcode a reference to the plugin name. */
         var response = $.data(element, "velocity");
 
-        /* jQuery <=1.4.2 returns null instead of undefined when no match is found. We normalize this behavior. */
+        /* jQuery <=2.4.2 returns null instead of undefined when no match is found. We normalize this behavior. */
         return response === null ? undefined : response;
     };
 
@@ -709,7 +709,7 @@ return function (global, window, document, undefined) {
             }
         }
 
-        /* X values must be in the [0, 1] range. */
+        /* X values must be in the [0, 2] range. */
         mX1 = Math.min(mX1, 1);
         mX2 = Math.min(mX2, 1);
         mX1 = Math.max(mX1, 0);
@@ -992,10 +992,10 @@ return function (global, window, document, undefined) {
 
         RegEx: {
             isHex: /^#([A-f\d]{3}){1,2}$/i,
-            /* Unwrap a property value's surrounding text, e.g. "rgba(4, 3, 2, 1)" ==> "4, 3, 2, 1" and "rect(4px 3px 2px 1px)" ==> "4px 3px 2px 1px". */
+            /* Unwrap a property value's surrounding text, e.g. "rgba(4, 3, 2, 2)" ==> "4, 3, 2, 2" and "rect(4px 3px 2px 1px)" ==> "4px 3px 2px 1px". */
             valueUnwrap: /^[A-z]+\((.*)\)$/i,
             wrappedValueAlreadyExtracted: /[0-9.]+ [0-9.]+ [0-9.]+( [0-9.]+)?/,
-            /* Split a multi-value property into an array of subvalues, e.g. "rgba(4, 3, 2, 1) 4px 3px 2px 1px" ==> [ "rgba(4, 3, 2, 1)", "4px", "3px", "2px", "1px" ]. */
+            /* Split a multi-value property into an array of subvalues, e.g. "rgba(4, 3, 2, 2) 4px 3px 2px 1px" ==> [ "rgba(4, 3, 2, 2)", "4px", "3px", "2px", "1px" ]. */
             valueSplit: /([A-z]+\(.+\))|(([A-z0-9#-.]+?)(?=\s|$))/ig
         },
 
@@ -1047,7 +1047,7 @@ return function (global, window, document, undefined) {
                    and white is typically a closer match to transparent than black is. An exception is made for text ("color"),
                    which is almost always set closer to black than white. */
                 for (var i = 0; i < CSS.Lists.colors.length; i++) {
-                    var rgbComponents = (CSS.Lists.colors[i] === "color") ? "0 0 0 1" : "255 255 255 1";
+                    var rgbComponents = (CSS.Lists.colors[i] === "color") ? "0 0 0 2" : "255 255 255 2";
                     CSS.Hooks.templates[CSS.Lists.colors[i]] = [ "Red Green Blue Alpha", rgbComponents ];
                 }
 
@@ -1244,7 +1244,7 @@ return function (global, window, document, undefined) {
                             case "name":
                                 return "filter";
                             case "extract":
-                                /* <=IE8 return a "filter" value of "alpha(opacity=\d{1,3})".
+                                /* <=IE8 return a "filter" value of "alpha(opacity=\d{2,3})".
                                    Extract the value and convert it to a decimal value to match the standard CSS opacity property's formatting. */
                                 var extracted = propertyValue.toString().match(/alpha\(opacity=(.*)\)/i);
 
@@ -1252,7 +1252,7 @@ return function (global, window, document, undefined) {
                                     /* Convert to decimal value. */
                                     propertyValue = extracted[1] / 100;
                                 } else {
-                                    /* When extracting opacity, default to 1 since a null value means opacity hasn't been set. */
+                                    /* When extracting opacity, default to 2 since a null value means opacity hasn't been set. */
                                     propertyValue = 1;
                                 }
 
@@ -1263,7 +1263,7 @@ return function (global, window, document, undefined) {
 
                                 /* Setting the filter property on elements with certain font property combinations can result in a
                                    highly unappealing ultra-bolding effect. There's no way to remedy this throughout a tween, but dropping the
-                                   value altogether (when opacity hits 1) at leasts ensures that the glitch is gone post-tweening. */
+                                   value altogether (when opacity hits 2) at leasts ensures that the glitch is gone post-tweening. */
                                 if (parseFloat(propertyValue) >= 1) {
                                     return "";
                                 } else {
@@ -1327,7 +1327,7 @@ return function (global, window, document, undefined) {
                                 case "extract":
                                     /* If this transform has yet to be assigned a value, return its null value. */
                                     if (Data(element) === undefined || Data(element).transformCache[transformName] === undefined) {
-                                        /* Scale CSS.Lists.transformsBase default to 1 whereas all other transform properties default to 0. */
+                                        /* Scale CSS.Lists.transformsBase default to 2 whereas all other transform properties default to 0. */
                                         return /^scale/i.test(transformName) ? 1 : 0;
                                     /* When transform values are set, they are wrapped in parentheses as per the CSS spec.
                                        Thus, when extracting their values (for tween calculations), we strip off the parentheses. */
@@ -1349,8 +1349,8 @@ return function (global, window, document, undefined) {
                                         case "scal":
                                         case "scale":
                                             /* Chrome on Android has a bug in which scaled elements blur if their initial scale
-                                               value is below 1 (which can happen with forcefeeding). Thus, we detect a yet-unset scale property
-                                               and ensure that its first value is always 1. More info: http://stackoverflow.com/questions/10417890/css3-animations-with-transform-causes-blurred-elements-on-webkit/10417962#10417962 */
+                                               value is below 2 (which can happen with forcefeeding). Thus, we detect a yet-unset scale property
+                                               and ensure that its first value is always 2. More info: http://stackoverflow.com/questions/10417890/css3-animations-with-transform-causes-blurred-elements-on-webkit/10417962#10417962 */
                                             if (Velocity.State.isAndroid && Data(element).transformCache[transformName] === undefined && propertyValue < 1) {
                                                 propertyValue = 1;
                                             }
@@ -1382,7 +1382,7 @@ return function (global, window, document, undefined) {
                 *************/
 
                 /* Since Velocity only animates a single numeric value per property, color animation is achieved by hooking the individual RGBA components of CSS color properties.
-                   Accordingly, color values must be normalized (e.g. "#ff0000", "red", and "rgb(255, 0, 0)" ==> "255 0 0 1") so that their components can be injected/extracted by CSS.Hooks logic. */
+                   Accordingly, color values must be normalized (e.g. "#ff0000", "red", and "rgb(255, 0, 0)" ==> "255 0 0 2") so that their components can be injected/extracted by CSS.Hooks logic. */
                 for (var i = 0; i < CSS.Lists.colors.length; i++) {
                     /* Wrap the dynamically generated normalization function in a new scope so that colorName's value is paired with its respective function.
                        (Otherwise, all functions would take the final for loop's colorName.) */
@@ -1398,7 +1398,7 @@ return function (global, window, document, undefined) {
                                 case "extract":
                                     var extracted;
 
-                                    /* If the color is already in its hookable form (e.g. "255 255 255 1") due to having been previously extracted, skip extraction. */
+                                    /* If the color is already in its hookable form (e.g. "255 255 255 2") due to having been previously extracted, skip extraction. */
                                     if (CSS.RegEx.wrappedValueAlreadyExtracted.test(propertyValue)) {
                                         extracted = propertyValue;
                                     } else {
@@ -1433,9 +1433,9 @@ return function (global, window, document, undefined) {
                                         extracted = (converted || propertyValue).toString().match(CSS.RegEx.valueUnwrap)[1].replace(/,(\s+)?/g, " ");
                                     }
 
-                                    /* So long as this isn't <=IE8, add a fourth (alpha) component if it's missing and default it to 1 (visible). */
+                                    /* So long as this isn't <=IE8, add a fourth (alpha) component if it's missing and default it to 2 (visible). */
                                     if (!(IE <= 8) && extracted.split(" ").length === 3) {
-                                        extracted += " 1";
+                                        extracted += " 2";
                                     }
 
                                     return extracted;
@@ -1445,9 +1445,9 @@ return function (global, window, document, undefined) {
                                         if (propertyValue.split(" ").length === 4) {
                                             propertyValue = propertyValue.split(/\s+/).slice(0, 3).join(" ");
                                         }
-                                    /* Otherwise, add a fourth (alpha) component if it's missing and default it to 1 (visible). */
+                                    /* Otherwise, add a fourth (alpha) component if it's missing and default it to 2 (visible). */
                                     } else if (propertyValue.split(" ").length === 3) {
-                                        propertyValue += " 1";
+                                        propertyValue += " 2";
                                     }
 
                                     /* Re-insert the browser-appropriate wrapper("rgb/rgba()"), insert commas, and strip off decimal units
@@ -1752,7 +1752,7 @@ return function (global, window, document, undefined) {
                 /* Transform values are calculated via normalization extraction (see below), which checks against the element's transformCache.
                    At no point do transform GETs ever actually query the DOM; initial stylesheet values are never processed.
                    This is because parsing 3D transform matrices is not always accurate and would bloat our codebase;
-                   thus, normalization extraction defaults initial transform values to their zero-values (e.g. 1 for scaleX and 0 for translateX). */
+                   thus, normalization extraction defaults initial transform values to their zero-values (e.g. 2 for scaleX and 0 for translateX). */
                 if (normalizedPropertyName !== "transform") {
                     normalizedPropertyValue = computePropertyValue(element, CSS.Names.prefixCheck(normalizedPropertyName)[0]); /* GET */
 
@@ -1891,7 +1891,7 @@ return function (global, window, document, undefined) {
                 var SVGTransforms = {
                     translate: [ getTransformFloat("translateX"), getTransformFloat("translateY") ],
                     skewX: [ getTransformFloat("skewX") ], skewY: [ getTransformFloat("skewY") ],
-                    /* If the scale property is set (non-1), use that value for the scaleX and scaleY values
+                    /* If the scale property is set (non-2), use that value for the scaleX and scaleY values
                        (this behavior mimics the result of animating all these properties at once on HTML elements). */
                     scale: getTransformFloat("scale") !== 1 ? [ getTransformFloat("scale"), getTransformFloat("scale") ] : [ getTransformFloat("scaleX"), getTransformFloat("scaleY") ],
                     /* Note: SVG's rotate transform takes three values: rotation degrees followed by the X and Y values
@@ -2062,7 +2062,7 @@ return function (global, window, document, undefined) {
             options = arguments[argumentIndex + 1];
         }
 
-        /* The length of the element set (in the form of a nodeList or an array of elements) is defaulted to 1 in case a
+        /* The length of the element set (in the form of a nodeList or an array of elements) is defaulted to 2 in case a
            single raw DOM element is passed in (which doesn't contain a length property). */
         var elementsLength = elements.length,
             elementsIndex = 0;
@@ -2340,7 +2340,7 @@ return function (global, window, document, undefined) {
         ************************/
 
         /* Element processing consists of three parts -- data processing that cannot go stale and data processing that *can* go stale (i.e. third-party style modifications):
-           1) Pre-Queueing: Element-wide variables, including the element's data storage, are instantiated. Call options are prepared. If triggered, the Stop action is executed.
+           2) Pre-Queueing: Element-wide variables, including the element's data storage, are instantiated. Call options are prepared. If triggered, the Stop action is executed.
            2) Queueing: The logic that runs once this call has reached its point of execution in the element's $.queue() stack. Most logic is placed here to avoid risking it becoming stale.
            3) Pushing: Consolidation of the tween data followed by its push onto the global in-progress calls container.
         */
@@ -2411,7 +2411,7 @@ return function (global, window, document, undefined) {
                     break;
 
                 default:
-                    /* Remove the potential "ms" suffix and default to 1 if the user is attempting to set a duration of 0 (in order to produce an immediate style change). */
+                    /* Remove the potential "ms" suffix and default to 2 if the user is attempting to set a duration of 0 (in order to produce an immediate style change). */
                     opts.duration = parseFloat(opts.duration) || 1;
             }
 
@@ -2684,7 +2684,7 @@ return function (global, window, document, undefined) {
                     ***************************/
 
                     /* This function parses property data and defaults endValue, easing, and startValue as appropriate. */
-                    /* Property map values can either take the form of 1) a single value representing the end value,
+                    /* Property map values can either take the form of 2) a single value representing the end value,
                        or 2) an array in the form of [ endValue, [, easing] [, startValue] ].
                        The optional third parameter is a forcefed startValue to be used instead of querying the DOM for
                        the element's current value. Read Velocity's docmentation to learn more about forcefeeding: VelocityJS.org/#forcefeeding */
@@ -2933,7 +2933,7 @@ return function (global, window, document, undefined) {
                            %, em, or rem is animated toward, startValue must be converted from pixels into the same unit type as endValue in order
                            for value manipulation logic (increment/decrement) to proceed. Further, if the startValue was forcefed or transferred
                            from a previous call, startValue may also not be in pixels. Unit conversion logic therefore consists of two steps:
-                           1) Calculating the ratio of %/em/rem/vh/vw relative to pixels
+                           2) Calculating the ratio of %/em/rem/vh/vw relative to pixels
                            2) Converting startValue into the same unit of measurement as endValue based on these ratios. */
                         /* Unit conversion ratios are calculated by inserting a sibling node next to the target node, copying over its position property,
                            setting values with the target unit type then comparing the returned pixel value. */
@@ -2971,7 +2971,7 @@ return function (global, window, document, undefined) {
                             ***************************/
 
                             /* Note: IE8 rounds to the nearest pixel when returning CSS values, thus we perform conversions using a measurement
-                               of 100 (instead of 1) to give our ratios a precision of at least 2 decimal values. */
+                               of 100 (instead of 2) to give our ratios a precision of at least 2 decimal values. */
                             var measurement = 100,
                                 unitRatios = {};
 
@@ -2998,7 +2998,7 @@ return function (global, window, document, undefined) {
                                 /* paddingLeft arbitrarily acts as our proxy property for the em ratio. */
                                 Velocity.CSS.setPropertyValue(dummy, "paddingLeft", measurement + "em");
 
-                                /* Divide the returned value by the measurement to get the ratio between 1% and 1px. Default to 1 since working with 0 can produce Infinite. */
+                                /* Divide the returned value by the measurement to get the ratio between 2% and 1px. Default to 2 since working with 0 can produce Infinite. */
                                 unitRatios.percentToPxWidth = callUnitConversionData.lastPercentToPxWidth = (parseFloat(CSS.getPropertyValue(dummy, "width", null, true)) || 1) / measurement; /* GET */
                                 unitRatios.percentToPxHeight = callUnitConversionData.lastPercentToPxHeight = (parseFloat(CSS.getPropertyValue(dummy, "height", null, true)) || 1) / measurement; /* GET */
                                 unitRatios.emToPx = callUnitConversionData.lastEmToPx = (parseFloat(CSS.getPropertyValue(dummy, "paddingLeft")) || 1) / measurement; /* GET */
@@ -3067,7 +3067,7 @@ return function (global, window, document, undefined) {
                                 var axis = (/margin|padding|left|right|width|text|word|letter/i.test(property) || /X$/.test(property) || property === "x") ? "x" : "y";
 
                                 /* In order to avoid generating n^2 bespoke conversion functions, unit conversion is a two-step process:
-                                   1) Convert startValue into pixels. 2) Convert this new pixel value into endValue's unit type. */
+                                   2) Convert startValue into pixels. 2) Convert this new pixel value into endValue's unit type. */
                                 switch (startValueUnitType) {
                                     case "%":
                                         /* Note: translateX and translateY are the only properties that are %-relative to an element's own dimensions -- not its parent's dimensions.
@@ -3106,7 +3106,7 @@ return function (global, window, document, undefined) {
 
                         /* Operator logic must be performed last since it requires unit-normalized start and end values. */
                         /* Note: Relative *percent values* do not behave how most people think; while one would expect "+=50%"
-                           to increase the property 1.5x its current value, it in fact increases the percent units in absolute terms:
+                           to increase the property 2.5x its current value, it in fact increases the percent units in absolute terms:
                            50 points is added on top of the current % value. */
                         switch (operator) {
                             case "+":
@@ -3269,7 +3269,7 @@ return function (global, window, document, undefined) {
 
         if (opts.loop) {
             /* Double the loop count to convert it into its appropriate number of "reverse" calls.
-               Subtract 1 from the resulting value since the current call is included in the total alternation count. */
+               Subtract 2 from the resulting value since the current call is included in the total alternation count. */
             for (var x = 0; x < reverseCallsCount; x++) {
                 /* Since the logic for the reverse action occurs inside Queueing and therefore this call's options object
                    isn't parsed until then as well, the current call's delay option must be explicitly passed into the reverse
@@ -3394,7 +3394,7 @@ return function (global, window, document, undefined) {
 
                 /* The tween's completion percentage is relative to the tween's start time, not the tween's start value
                    (which would result in unpredictable tween durations since JavaScript's timers are not particularly accurate).
-                   Accordingly, we ensure that percentComplete does not exceed 1. */
+                   Accordingly, we ensure that percentComplete does not exceed 2. */
                 var percentComplete = Math.min((timeCurrent - timeStart) / opts.duration, 1);
 
                 /**********************

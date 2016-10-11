@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="centos," />
 
 
 
@@ -84,19 +84,28 @@
 
 
 
-<meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
+<meta name="description" content="新建用户，禁止root登陆，禁止通过密码登录系统更新1yum update
+添加一个用户1useradd yefeng &amp;amp;&amp;amp; passwd yefeng
+使该用户有sudo权限1usermod -aG wheel yefeng
+在Linux或OS X系统上创建RSA公私钥1ssh-keygen -b 4096
+在服务器上创建文件夹1mkdir -p ~/.ssh &amp;amp;&amp;amp">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://yoursite.com/2016/09/26/hello-world/index.html">
+<meta property="og:title" content="centos起步">
+<meta property="og:url" content="http://yoursite.com/2016/09/28/centos-startup/index.html">
 <meta property="og:site_name" content="叶枫的博客">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
-<meta property="og:updated_time" content="2016-09-26T13:29:26.000Z">
+<meta property="og:description" content="新建用户，禁止root登陆，禁止通过密码登录系统更新1yum update
+添加一个用户1useradd yefeng &amp;amp;&amp;amp; passwd yefeng
+使该用户有sudo权限1usermod -aG wheel yefeng
+在Linux或OS X系统上创建RSA公私钥1ssh-keygen -b 4096
+在服务器上创建文件夹1mkdir -p ~/.ssh &amp;amp;&amp;amp">
+<meta property="og:updated_time" content="2016-09-28T07:27:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Quick">
+<meta name="twitter:title" content="centos起步">
+<meta name="twitter:description" content="新建用户，禁止root登陆，禁止通过密码登录系统更新1yum update
+添加一个用户1useradd yefeng &amp;amp;&amp;amp; passwd yefeng
+使该用户有sudo权限1usermod -aG wheel yefeng
+在Linux或OS X系统上创建RSA公私钥1ssh-keygen -b 4096
+在服务器上创建文件夹1mkdir -p ~/.ssh &amp;amp;&amp;amp">
 
 
 
@@ -117,9 +126,9 @@ Quick">
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2016/09/26/hello-world/"/>
+  <link rel="canonical" href="http://yoursite.com/2016/09/28/centos-startup/"/>
 
-  <title> Hello World | 叶枫的博客 </title>
+  <title> centos起步 | 叶枫的博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -239,7 +248,7 @@ Quick">
             
             
               
-                Hello World
+                centos起步
               
             
           </h1>
@@ -251,8 +260,8 @@ Quick">
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-26T21:29:26+08:00" content="2016-09-26">
-              2016-09-26
+            <time itemprop="dateCreated" datetime="2016-09-28T12:28:51+08:00" content="2016-09-28">
+              2016-09-28
             </time>
           </span>
 
@@ -279,15 +288,17 @@ Quick">
       
 
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+        <h1 id="新建用户，禁止root登陆，禁止通过密码登录"><a href="#新建用户，禁止root登陆，禁止通过密码登录" class="headerlink" title="新建用户，禁止root登陆，禁止通过密码登录"></a>新建用户，禁止root登陆，禁止通过密码登录</h1><p>系统更新<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum update</div></pre></td></tr></table></figure></p>
+<p>添加一个用户<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">useradd yefeng &amp;&amp; passwd yefeng</div></pre></td></tr></table></figure></p>
+<p>使该用户有sudo权限<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">usermod -aG wheel yefeng</div></pre></td></tr></table></figure></p>
+<p>在Linux或OS X系统上创建RSA公私钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ssh-keygen -b 4096</div></pre></td></tr></table></figure></p>
+<p>在服务器上创建文件夹<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir -p ~/.ssh &amp;&amp; sudo chmod -R 700 ~/.ssh/</div></pre></td></tr></table></figure></p>
+<p>上传公钥<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">scp ~/.ssh/id_rsa.pub yefeng@ip_address:~/.ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<p>禁止root用户通过ssh登录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo vi /etc/ssh/sshd_config</div></pre></td></tr></table></figure></p>
+<p>搜索PermitRootLogin设置为no</p>
+<p>搜索PasswordAuthentication通过密码登录，考虑到经常在多台电脑上ssh登录，没有将此项设置为no</p>
+<p>重启SSH服务以使上面的改动生效<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo systemctl restart sshd</div></pre></td></tr></table></figure></p>
+<h1 id="iptables"><a href="#iptables" class="headerlink" title="iptables"></a>iptables</h1><p>Centos7 默认是已安装了 Firewall，但是没有启动的。如果打算使用 Firewall ，可以看一下这篇文章<br><a href="https://help.aliyun.com/knowledge_detail/41317.html#云服务器 ECS CentOS 7配置默认防火墙 Firewall" target="_blank" rel="external">云服务器 ECS CentOS 7配置默认防火墙 Firewall</a><br>我们这里安装并开启iptables<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sudo yum install iptables-services</div></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -308,17 +319,27 @@ Quick">
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/centos/" rel="tag">#centos</a>
+          
+        </div>
+      
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2016/09/26/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
           </div>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2016/09/28/centos-startup/" rel="prev" title="centos起步">
-                centos起步 <i class="fa fa-chevron-right"></i>
+              <a href="/2016/09/28/centos-install-mysql/" rel="prev" title="centos安装mysql">
+                centos安装mysql <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -426,7 +447,7 @@ Quick">
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#新建用户，禁止root登陆，禁止通过密码登录"><span class="nav-number">1.</span> <span class="nav-text">新建用户，禁止root登陆，禁止通过密码登录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#iptables"><span class="nav-number">2.</span> <span class="nav-text">iptables</span></a></li></ol></div>
             
           </div>
         </section>

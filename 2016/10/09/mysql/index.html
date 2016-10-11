@@ -1,0 +1,644 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.2" />
+
+
+
+
+
+
+<meta name="description" content="显示数据库表支持的引擎1show ENGINES
+查看当前数据库表的状态1show table status from jt_mysql
+一些概念双主键2个字段的值不能同时相同
+基本命令显示最后一个执行语句所产生的错误1show errors;
+对比MyISAM和InnoDB其中表user_sys为InnoDB模式，表user_sys1为MyISAM模式
+插入100万条数据编写一个存储过程，名为a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql笔记">
+<meta property="og:url" content="http://yoursite.com/2016/10/09/mysql/index.html">
+<meta property="og:site_name" content="叶枫的博客">
+<meta property="og:description" content="显示数据库表支持的引擎1show ENGINES
+查看当前数据库表的状态1show table status from jt_mysql
+一些概念双主键2个字段的值不能同时相同
+基本命令显示最后一个执行语句所产生的错误1show errors;
+对比MyISAM和InnoDB其中表user_sys为InnoDB模式，表user_sys1为MyISAM模式
+插入100万条数据编写一个存储过程，名为a">
+<meta property="og:updated_time" content="2016-10-11T07:31:18.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mysql笔记">
+<meta name="twitter:description" content="显示数据库表支持的引擎1show ENGINES
+查看当前数据库表的状态1show table status from jt_mysql
+一些概念双主键2个字段的值不能同时相同
+基本命令显示最后一个执行语句所产生的错误1show errors;
+对比MyISAM和InnoDB其中表user_sys为InnoDB模式，表user_sys1为MyISAM模式
+插入100万条数据编写一个存储过程，名为a">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/10/09/mysql/"/>
+
+  <title> mysql笔记 | 叶枫的博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">叶枫的博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">web开发笔记</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                mysql笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-10-09T14:22:55+08:00" content="2016-10-09">
+              2016-10-09
+            </time>
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="显示数据库表支持的引擎"><a href="#显示数据库表支持的引擎" class="headerlink" title="显示数据库表支持的引擎"></a>显示数据库表支持的引擎</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show ENGINES</div></pre></td></tr></table></figure>
+<h1 id="查看当前数据库表的状态"><a href="#查看当前数据库表的状态" class="headerlink" title="查看当前数据库表的状态"></a>查看当前数据库表的状态</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show table status from jt_mysql</div></pre></td></tr></table></figure>
+<h1 id="一些概念"><a href="#一些概念" class="headerlink" title="一些概念"></a>一些概念</h1><h2 id="双主键"><a href="#双主键" class="headerlink" title="双主键"></a>双主键</h2><p>2个字段的值不能同时相同</p>
+<h1 id="基本命令"><a href="#基本命令" class="headerlink" title="基本命令"></a>基本命令</h1><p>显示最后一个执行语句所产生的错误<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show errors;</div></pre></td></tr></table></figure></p>
+<h1 id="对比MyISAM和InnoDB"><a href="#对比MyISAM和InnoDB" class="headerlink" title="对比MyISAM和InnoDB"></a>对比MyISAM和InnoDB</h1><p>其中表user_sys为InnoDB模式，表user_sys1为MyISAM模式</p>
+<h2 id="插入100万条数据"><a href="#插入100万条数据" class="headerlink" title="插入100万条数据"></a>插入100万条数据</h2><p>编写一个存储过程，名为add_users<br>t为参数：IN t int<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">BEGIN</div><div class="line">  set @num=1;</div><div class="line">  while @num&lt;1000001 DO</div><div class="line">    if t=1 then</div><div class="line">      insert into user_sys(user_name,user_pwd) values(concat(&apos;user&apos;,@num),&apos;123&apos;);</div><div class="line">    else</div><div class="line">      insert into user_sys1(user_name,user_pwd) values(concat(&apos;user&apos;,@num),&apos;123&apos;);</div><div class="line">    end if;</div><div class="line">    set @num=@num+1;</div><div class="line">  end while;</div><div class="line">END</div></pre></td></tr></table></figure></p>
+<p>在查询器中执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">call add_users(1);</div></pre></td></tr></table></figure></p>
+<p>使用阿里云的1核2G内存，插入时间InnoDB非常慢(大概1小时)，MyISAM快很多(大概40s)。</p>
+<h2 id="查询时间对比"><a href="#查询时间对比" class="headerlink" title="查询时间对比"></a>查询时间对比</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">select count(*) from user_sys;  //0.16s</div><div class="line">select count(*) from user_sys1;  //0.02s</div><div class="line"></div><div class="line">select * from user_sys limit 0,1000;  //0.05s</div><div class="line">select * from user_sys1 limit 0,1000;  //0.05s</div><div class="line">select * from user_sys limit 900000,1000;  //0.36s</div><div class="line">select * from user_sys1 limit 900000,1000;  //0.19s</div><div class="line"></div><div class="line">select * from user_sys where user_name=&apos;user10&apos;;  //0.4s</div><div class="line">select * from user_sys1 where user_name=&apos;user10&apos;; //0.21s</div><div class="line">select * from user_sys where user_name=&apos;user900000&apos;;  //0.41s</div><div class="line">select * from user_sys1 where user_name=&apos;user900000&apos;; //0.21s</div></pre></td></tr></table></figure>
+<p>当前mysql版本5.7.15，在查询上的表现,InnoDB表比MyISAM表快那么一点</p>
+<h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><p>数据库表字段的索引分普通索引和唯一索引。<br>如果用户名不允许相同，设置唯一索引的好处是，在插入的时候不需要再程序中做判断。<br>对user_name字段添加唯一索引后：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select * from user_sys where user_name=&apos;user900000&apos;;  //0.02s</div><div class="line">select * from user_sys1 where user_name=&apos;user900000&apos;; //0.02s</div></pre></td></tr></table></figure></p>
+<h1 id="用户日志表"><a href="#用户日志表" class="headerlink" title="用户日志表"></a>用户日志表</h1><p>用户日志表不需要支持事务，使用插入数据更快的MyISAM引擎<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">CREATE TABLE `user_log` (</div><div class="line">  `id` int(11) NOT NULL AUTO_INCREMENT,</div><div class="line">  `user_id` int(11) DEFAULT NULL,</div><div class="line">  `log_type` varchar(20) DEFAULT NULL,</div><div class="line">  `log_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP,</div><div class="line">  PRIMARY KEY (`id`)</div><div class="line">) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;</div></pre></td></tr></table></figure></p>
+<p>写一个名为sp_user_log的存储过程，灌入数据1000万条数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">BEGIN</div><div class="line">  set @num=1;</div><div class="line">  while @num&lt;10000001 DO</div><div class="line">    insert into user_log(user_id,log_type) values(floor(rand()*100000),&apos;log success&apos;);</div><div class="line">    set @num=@num+1;</div><div class="line">  end while;</div><div class="line">END</div></pre></td></tr></table></figure></p>
+<p>查询用户登录记录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select count(*) from user_sys a,user_log b where a.id=b.user_id;  //用时29.1秒，结果为9999989</div><div class="line">select a.user_name,a.id,b.log_date from user_sys a,user_log b where a.id=b.user_id order by b.id desc limit 1000000,10;  //17.45秒</div></pre></td></tr></table></figure></p>
+<h2 id="给用户表日志表添加冗余字段"><a href="#给用户表日志表添加冗余字段" class="headerlink" title="给用户表日志表添加冗余字段"></a>给用户表日志表添加冗余字段</h2><p>考虑到用户表和用户日志表非常大，同时用户表还是InnoDB模式（在使用中会锁表），因此给用户表日志表添加冗余字段（尽管这样不符合三范式）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">select * from user_log order by id desc limit 1000000,10;   //19.61s</div><div class="line">select id,user_name,log_date from user_log order by id desc limit 1000000,10;  //8.28s</div></pre></td></tr></table></figure></p>
+<h1 id="点击日志表"><a href="#点击日志表" class="headerlink" title="点击日志表"></a>点击日志表</h1><p>商品被用户点击的日志表</p>
+<h1 id="mysql函数"><a href="#mysql函数" class="headerlink" title="mysql函数"></a>mysql函数</h1><p>FOUND_ROW()  select时返回最近一条sql的结果集条数<br>ROW_COUNT()  update delete insert受影响的条数</p>
+<h1 id="mysql事件编写定时任务"><a href="#mysql事件编写定时任务" class="headerlink" title="mysql事件编写定时任务"></a>mysql事件编写定时任务</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">show VARIABLES like &apos;%event_%&apos;;</div></pre></td></tr></table></figure>
+<p>可以看到查询结果中event_scheduler是off默认的关闭状态<br>设置为on<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">set global event_scheduler=ON</div></pre></td></tr></table></figure></p>
+<h1 id="动态执行sql"><a href="#动态执行sql" class="headerlink" title="动态执行sql"></a>动态执行sql</h1><h1 id="临时表"><a href="#临时表" class="headerlink" title="临时表"></a>临时表</h1><p>drop TEMPORARY table if EXISTS temp_a<br>creat TEMPORARY table temp_a as select 3 as id,’fff’ as name;<br>select * from temp_a;</p>
+<h1 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h1><h2 id="自动提交"><a href="#自动提交" class="headerlink" title="自动提交"></a>自动提交</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">insert into user_balance(user_id,user_money) values (3,20);</div></pre></td></tr></table></figure>
+<p>当我们执行上面的sql语句，可以发现数据就被插入到了数据库表中。这是为何呢？</p>
+<p>autocommit我们可以通过<figure class="highlight plain"><figcaption><span>VARIABLES like '%COMMIT%';```查看```autocommit```的值</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">当通过使用```set autocommit=0```来对当前回话设置autocommit的值后，再执行上面的insert语句后就不会自动在数据库表中插入这条记录。</div><div class="line">新建一个查询会话，直接执行上面的insert语句，插入的记录中id=3</div><div class="line">在```set autocommit=0```的会话中，再执行```commit```，这时候在数据库表中新增了一条记录，同时这条记录的id为2</div><div class="line">为了防止我们一旦插入数据忘了commit,所以不到特殊情况，我们不会设置autocommit=0</div><div class="line"></div><div class="line">## 使用事务</div><div class="line">```mysql</div><div class="line">insert into user_balance(user_id,user_money) values (3,10);</div><div class="line">start TRANSACTION;</div><div class="line">insert into user_balance(user_id,user_money) values (4,20);</div><div class="line">select max(user_id) from user_balance;</div><div class="line">commit;</div></pre></td></tr></table></figure></p>
+<p>使用sleep函数来模拟数据卡顿<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">```mysql</div><div class="line">insert into user_balance(user_id,user_money) values (3,10);</div><div class="line">start TRANSACTION;</div><div class="line">insert into user_balance(user_id,user_money) values (4,20);</div><div class="line">select max(user_id) from user_balance;</div><div class="line">select sleep(6);</div><div class="line">commit;</div></pre></td></tr></table></figure></p>
+<h2 id="事务的异常"><a href="#事务的异常" class="headerlink" title="事务的异常"></a>事务的异常</h2><p>使用自定义异常处理格式：<figure class="highlight plain"><figcaption><span>xxx1 handler for xxx2 执行sql;```</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">xxx1有continue和exit还有undo</div><div class="line">xxx2有SQLSTATE、SQLWARNING、NOT FOUND、SQLEXCEPTION</div></pre></td></tr></table></figure></p>
+<p>BEGIN</p>
+<pre><code>#declare CONTINUE HANDLER for SQLEXCEPTION select &apos;出错了,错误sql语句后面的语句被执行了&apos;；
+#declare EXIT HANDLER for SQLEXCEPTION select &apos;出错了，错误sql语句后面的语句不会被执行&apos;；
+#declare CONTINUE HANDLER for SQLEXCEPTION show ERRORS;
+
+DECLARE err int DEFAULT 0;  #declare定义的变量为局部变量，set @err=0;定义的是回话变量
+declare CONTINUE HANDLER for SQLEXCEPTION set err=1;
+start TRANSACTION;
+#insert into user_balance(user_id,user_money) values (3,&apos;ef&apos;);
+insert into user_balance(user_id,user_money) values (4,10);
+insert into user_balance(user_id,user_money) values (3,&apos;ef&apos;);
+if err=1 THEN
+      select &apos;出错了&apos;;
+  ROLLBACK;
+ELSE
+  COMMIT;
+end if;
+</code></pre><p>end<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">## 增加一个用户充值日志表，使用事务，同时模拟服务器很卡</div><div class="line">写一个名为```sp_add_usermoney```的存储过程，定义如下输入</div><div class="line">IN _user_id int,IN _log_type tinyint,IN _log_des varchar(200),IN _log_value decimal(10,2),IN isstop bit</div></pre></td></tr></table></figure></p>
+<p>BEGIN<br>    DECLARE t_error int DEFAULT 0;<br>    DECLARE usercount int DEFAULT 0;<br>    DECLARE CONTINUE HANDLER for SQLEXCEPTION set t_error=1;<br>    start TRANSACTION;</p>
+<pre><code>  #插入用户充值记录表
+  insert into user_balance_log(user_id,log_type,log_des,log_value) values(_user_id,_log_type,_log_des,_log_value);
+  if ROW_COUNT()&gt;0 THEN #代表日志表插入成功
+     #判断用户余额表是否存在用户
+     select count(*) into usercount from user_balance where user_id=_user_id;
+       if usercount&gt;0 THEN #代表已经存在用户
+         update user_balance set user_money=user_money+_log_value where user_id=_user_id;
+       ELSE
+         insert into user_balance(user_id,user_money) values(_user_id,_log_value);
+       end if;
+  end if;
+
+
+#模拟服务器很卡
+    if isstop=true then
+    select SLEEP(7),&apos;卡顿结束&apos;;
+    end if;
+
+
+if t_error=1 THEN
+  ROLLBACK;
+ELSE
+  commit;
+end if;
+</code></pre><p>END<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">执行存储过程```call sp_add_usermoney(3,1,&apos;用户充值&apos;,10,true);</div></pre></td></tr></table></figure></p>
+<p>如果在这卡顿的7秒时间内，在另外一个会话中执行了如下的sql语句<br><figure class="highlight plain"><figcaption><span>sp_add_usermoney(3,1,'用户充值',10,false);```</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">那么会发现在表user_balance中将出现几条user_id为3的记录。</div><div class="line">虽然我们可以通过去掉user_balance表中的id字段，将user_id设为主键来解决这个问题。但是我们为了理解下一节的内容，而没有这么做</div><div class="line"></div><div class="line">## 表级锁</div><div class="line">上一节模拟了服务器卡顿的情况。发现在多线程并发时，如果操作不当就会产生数据冲突，所以这一节学习一下mysql中的锁表机制</div><div class="line">### 读锁</div><div class="line">另外的一个会话只能读，不能写入</div></pre></td></tr></table></figure></p>
+<p>lock table user_balance read;</p>
+<p>#delete from user_balance; #表不能写入，执行到这条语句将出错</p>
+<p>#insert into user_balance(user_id,user_money) values(3,50);  #表不能写入，执行到这条语句将出错<br>select * from user_balance;<br>unlock tables;<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">如果忘了写```unlock tables;```,在另外一个会话中进行写操作，会出现等待。</div><div class="line">在等待的过程中，要么执行一下```unlock tables;```,要么再次执行```lock table user_balance read;```，那么那个另外的会话中等待着的写操作将执行。</div><div class="line"></div><div class="line">### 写锁</div><div class="line">写锁之后（忘了写unlock tables;），另外的会话不管是读还是写的操作都不能进行</div></pre></td></tr></table></figure></p>
+<p>lock table user_balance write;<br>insert into user_balance(user_id,user_money) values(7,30);<br>select * from user_balance;<br>unlock tables;<br>```</p>
+<h2 id="行级锁"><a href="#行级锁" class="headerlink" title="行级锁"></a>行级锁</h2>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/09/centos-php/" rel="next" title="centos-php">
+                <i class="fa fa-chevron-left"></i> centos-php
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="叶枫" />
+          <p class="site-author-name" itemprop="name">叶枫</p>
+          <p class="site-description motion-element" itemprop="description">html,css,javascript,php,mysql,centos</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#显示数据库表支持的引擎"><span class="nav-number">1.</span> <span class="nav-text">显示数据库表支持的引擎</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查看当前数据库表的状态"><span class="nav-number">2.</span> <span class="nav-text">查看当前数据库表的状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一些概念"><span class="nav-number">3.</span> <span class="nav-text">一些概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#双主键"><span class="nav-number">3.1.</span> <span class="nav-text">双主键</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基本命令"><span class="nav-number">4.</span> <span class="nav-text">基本命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对比MyISAM和InnoDB"><span class="nav-number">5.</span> <span class="nav-text">对比MyISAM和InnoDB</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#插入100万条数据"><span class="nav-number">5.1.</span> <span class="nav-text">插入100万条数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询时间对比"><span class="nav-number">5.2.</span> <span class="nav-text">查询时间对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#索引"><span class="nav-number">6.</span> <span class="nav-text">索引</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户日志表"><span class="nav-number">7.</span> <span class="nav-text">用户日志表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#给用户表日志表添加冗余字段"><span class="nav-number">7.1.</span> <span class="nav-text">给用户表日志表添加冗余字段</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#点击日志表"><span class="nav-number">8.</span> <span class="nav-text">点击日志表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql函数"><span class="nav-number">9.</span> <span class="nav-text">mysql函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#mysql事件编写定时任务"><span class="nav-number">10.</span> <span class="nav-text">mysql事件编写定时任务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#动态执行sql"><span class="nav-number">11.</span> <span class="nav-text">动态执行sql</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#临时表"><span class="nav-number">12.</span> <span class="nav-text">临时表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事务"><span class="nav-number">13.</span> <span class="nav-text">事务</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#自动提交"><span class="nav-number">13.1.</span> <span class="nav-text">自动提交</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事务的异常"><span class="nav-number">13.2.</span> <span class="nav-text">事务的异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#行级锁"><span class="nav-number">13.3.</span> <span class="nav-text">行级锁</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">叶枫</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.0.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.0.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

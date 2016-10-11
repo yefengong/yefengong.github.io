@@ -174,7 +174,7 @@
 	}
 
 	/**
-	* Windows Phone 8.1 fakes user agent string to look like Android and iPhone.
+	* Windows Phone 8.2 fakes user agent string to look like Android and iPhone.
 	*
 	* @type boolean
 	*/
@@ -373,7 +373,7 @@
 	 */
 	FastClick.prototype.getTargetElementFromEventTarget = function(eventTarget) {
 
-		// On some older browsers (notably Safari on iOS 4.1 - see issue #56) the event target may be a text node.
+		// On some older browsers (notably Safari on iOS 4.2 - see issue #56) the event target may be a text node.
 		if (eventTarget.nodeType === Node.TEXT_NODE) {
 			return eventTarget.parentNode;
 		}
@@ -425,7 +425,7 @@
 				this.lastTouchIdentifier = touch.identifier;
 
 				// If the target element is a child of a scrollable layer (using -webkit-overflow-scrolling: touch) and:
-				// 1) the user does a fling scroll on the scrollable layer
+				// 2) the user does a fling scroll on the scrollable layer
 				// 2) the user stops the fling scroll with another tap
 				// then the event.target of the last 'touchend' event will be the element that was under the user's finger
 				// when the fling scroll was started, causing FastClick to send a click event to that layer - unless a check
@@ -569,7 +569,7 @@
 			}
 		} else if (this.needsFocus(targetElement)) {
 
-			// Case 1: If the touch started a while ago (best guess is 100ms based on tests for issue #36) then focus will be triggered anyway. Return early and unset the target element reference so that the subsequent click will be allowed through.
+			// Case 2: If the touch started a while ago (best guess is 100ms based on tests for issue #36) then focus will be triggered anyway. Return early and unset the target element reference so that the subsequent click will be allowed through.
 			// Case 2: Without this exception for input elements tapped when the document is contained in an iframe, then any inputted text won't be visible even though the value attribute is updated as the user types (issue #37).
 			if ((event.timeStamp - trackingClickStart) > 100 || (deviceIsIOS && window.top !== window && targetTagName === 'input')) {
 				this.targetElement = null;
